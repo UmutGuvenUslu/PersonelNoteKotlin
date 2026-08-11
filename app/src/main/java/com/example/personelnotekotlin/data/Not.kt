@@ -3,13 +3,13 @@ package com.example.personelnotekotlin.data
 import java.util.UUID
 
 data class Not(
-    val _id:String = UUID.randomUUID().toString(),
-    val baslik:String,
-    val aciklama:String,
-    val oncelik:Int,
-    val guncellemeTarihi:Long = System.currentTimeMillis(),
-    val senkronMu:Boolean = false,
-    val silindiMi:Boolean = false,
-    val sunucudaVarMi:Boolean = false
+    var _id:String = UUID.randomUUID().toString(),
+    var baslik:String,
+    var aciklama:String,
+    var oncelik:Int,
+    var guncellemeTarihi:Long = System.currentTimeMillis(),
+    var senkronMu:Boolean = false,
+    var silindiMi:Boolean = false,
+    var sunucudaVarMi:Boolean = false
 
 )
