@@ -18,7 +18,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val syncRequest = PeriodicWorkRequestBuilder<SyncWorker>(1,TimeUnit.HOURS)
+        val syncRequest = PeriodicWorkRequestBuilder<SyncWorker>(1,TimeUnit.MINUTES)
             .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
             .build()
 
