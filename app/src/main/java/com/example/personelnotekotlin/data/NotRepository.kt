@@ -18,6 +18,19 @@ class  NotRepository(
             oncelik = oncelik
         )
         notDao.notEkleVeyaGuncelle(yeniNot)
+        notSenkronizeEt()
+    }
+
+    suspend fun notDuzenle(not: Not,baslik:String,aciklama:String,oncelik:Int){
+        var guncelNot = not.copy(
+            baslik = baslik,
+            aciklama = aciklama,
+            oncelik = oncelik,
+            guncellemeTarihi = System.currentTimeMillis(),
+            senkronMu = false
+        )
+        notDao.notEkleVeyaGuncelle(guncelNot)
+        notSenkronizeEt()
     }
 
     suspend fun notSil(not: Not){
@@ -27,59 +40,30 @@ class  NotRepository(
         }else{
             notDao.notHardSil(not)
         }
-
+        notSenkronizeEt()
     }
 
-    suspend fun notSenkronizeEt(){
-
+    suspend fun notSenkronizeEt() {
         try {
             val bekleyenNotlar = notDao.senkronOlmayanlariGetir()
 
+            if (bekleyenNotlar.isEmpty()) return
 
-            for (not in bekleyenNotlar){
+            val yanit = notApi.notSenkronizeEt(bekleyenNotlar)
 
-                if (not.silindiMi){
-                    var yanit = notApi.notSil(not._id)
-                    if (yanit.isSuccessful){
+            if (yanit.isSuccessful) {
+                val senkronizeIdListesi = bekleyenNotlar.map { it._id }
+                notDao.notSenkronizeEt(senkronizeIdListesi)
+
+                for (not in bekleyenNotlar){
+                    if(not.silindiMi){
                         notDao.notHardSil(not)
                     }
-                }else if(!not.sunucudaVarMi){
-                    var yanit = notApi.notEkle(not)
-                    if (yanit.isSuccessful){
-                        notDao.notSenkronizeEt(listOf(not._id))
-                    }
-                }else{
-
-                        var yanit = notApi.notDuzenle(not._id,not)
-                        if (yanit.isSuccessful){
-                            notDao.notSenkronizeEt(listOf(not._id))
-                        }
-                    }
-
-
-            }
-
-
-
-            var yanit = notApi.notGetir()
-            if (yanit.isSuccessful){
-                var gelenNotlar = yanit.body() ?: emptyList()
-                for (not in gelenNotlar){
-                    not.senkronMu = true
-                    not.sunucudaVarMi = true
-
-                    notDao.notEkleVeyaGuncelle(not)
-
                 }
             }
-
-
-        }catch (e:Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
         }
-
-
-
     }
 
 
