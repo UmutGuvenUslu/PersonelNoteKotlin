@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 
-@Database(entities = [Not::class], version = 1, exportSchema = false)
+@Database(entities = [Not::class], version = 2, exportSchema = false)
 abstract class RoomDbContext:RoomDatabase() {
 
     abstract fun notDao():INotDataAccess
@@ -21,7 +21,8 @@ fun databaseyiGetir(context: Context):RoomDbContext{
             context.applicationContext,
             RoomDbContext::class.java,
             "personelnot_db"
-        ).build()
+        ).fallbackToDestructiveMigration()
+            .build()
     }
     return KOPYA!!
 }

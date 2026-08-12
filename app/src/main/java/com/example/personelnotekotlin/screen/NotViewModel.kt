@@ -26,9 +26,21 @@ class NotViewModel(
         }
     }
 
+    fun notDuzenle(not: Not,baslik:String,aciklama:String,oncelik:String){
+        viewModelScope.launch {
+            repository.notDuzenle(not,baslik,aciklama,metinToSayi(oncelik))
+        }
+    }
+
     fun notSil(not: Not) {
         viewModelScope.launch {
             repository.notSil(not)
+        }
+    }
+
+    fun notSenkronizeEt(){
+        viewModelScope.launch {
+            repository.notSenkronizeEt()
         }
     }
 
@@ -40,6 +52,16 @@ class NotViewModel(
             sayi = 2
         }
         return sayi
+    }
+
+    fun sayiToMetin(deger:Int):String{
+        var metin = "Düşük"
+        if (deger == 3){
+            metin = "Kritik"
+        }else if(deger == 2){
+            metin = "Orta"
+        }
+        return metin
     }
 
 

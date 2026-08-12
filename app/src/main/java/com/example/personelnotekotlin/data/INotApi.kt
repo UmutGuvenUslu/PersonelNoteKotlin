@@ -21,4 +21,9 @@ interface INotApi {
 
     @PUT("note/{id}")
     suspend fun notDuzenle(@Path("id") id:String,@Body not: Not):Response<Not>
+
+    @POST("notes/sync")
+    suspend fun notSenkronizeEt(@Body notlar:List<Not>):Response<Any>
+
+
 }
