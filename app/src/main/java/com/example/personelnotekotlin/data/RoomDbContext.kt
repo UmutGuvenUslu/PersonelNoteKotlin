@@ -21,8 +21,7 @@ fun databaseyiGetir(context: Context):RoomDbContext{
             context.applicationContext,
             RoomDbContext::class.java,
             "personelnot_db"
-        ).fallbackToDestructiveMigration()
-            .build()
+        ).build()
     }
     return KOPYA!!
 }

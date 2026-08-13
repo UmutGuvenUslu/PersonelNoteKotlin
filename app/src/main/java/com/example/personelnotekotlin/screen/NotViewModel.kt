@@ -40,7 +40,7 @@ class NotViewModel(
 
     fun notSenkronizeEt(){
         viewModelScope.launch {
-            repository.notSenkronizeEt()
+            repository.tamSenkronizasyonYap()
         }
     }
 
