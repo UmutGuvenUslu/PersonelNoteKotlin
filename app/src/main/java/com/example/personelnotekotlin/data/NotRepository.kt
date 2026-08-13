@@ -66,5 +66,26 @@ class  NotRepository(
         }
     }
 
+    suspend fun sunucudanVerileriGuncelle() {
+        try {
+            val yanit = notApi.notGetir()
+            if (yanit.isSuccessful) {
+                yanit.body()?.let { sunucudakiNotlar ->
+                    for (not in sunucudakiNotlar) {
+                        val guncelNot = not.copy(senkronMu = true, sunucudaVarMi = true)
+                        notDao.notEkleVeyaGuncelle(guncelNot)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    suspend fun tamSenkronizasyonYap() {
+        notSenkronizeEt()
+
+        sunucudanVerileriGuncelle()
+    }
 
 }

@@ -15,7 +15,7 @@ class SyncWorker(
 
             var repository = NotRepository(database.notDao())
 
-            repository.notSenkronizeEt()
+            repository.tamSenkronizasyonYap()
 
             Result.success()
         }catch (e:Exception){
