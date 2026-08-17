@@ -3,29 +3,34 @@ package com.example.personelnotekotlin.data
 import RetrofitClient
 import androidx.room.Dao
 import kotlinx.coroutines.flow.Flow
+import java.util.UUID
 
 class  NotRepository(
     private val notDao: INotDataAccess,
-    private val notApi: INotApi = RetrofitClient.apiService
+    private val notApi: INotApi = RetrofitClient.notApiService
 ){
 
     fun aktifNotlariGetir(): Flow<List<Not>> = notDao.aktifNotlariGetir()
 
-    suspend fun notEkle(baslik:String,aciklama:String,oncelik:Int){
+    suspend fun notEkle(baslik:String,aciklama:String,oncelik:Int,kategoriId:String,kategori: String){
         var yeniNot = Not(
             baslik = baslik,
             aciklama = aciklama,
-            oncelik = oncelik
+            oncelik = oncelik,
+            kategoriId = UUID.fromString(kategoriId),
+            kategori = kategori
         )
         notDao.notEkleVeyaGuncelle(yeniNot)
         notSenkronizeEt()
     }
 
-    suspend fun notDuzenle(not: Not,baslik:String,aciklama:String,oncelik:Int){
+    suspend fun notDuzenle(not: Not,baslik:String,aciklama:String,oncelik:Int,kategoriId:String,kategori: String){
         var guncelNot = not.copy(
             baslik = baslik,
             aciklama = aciklama,
             oncelik = oncelik,
+            kategoriId = UUID.fromString(kategoriId),
+            kategori = kategori,
             guncellemeTarihi = System.currentTimeMillis(),
             senkronMu = false
         )
