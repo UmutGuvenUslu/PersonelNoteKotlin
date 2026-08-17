@@ -13,9 +13,11 @@ class SyncWorker(
         return try {
             var database = databaseyiGetir(applicationContext)
 
-            var repository = NotRepository(database.notDao())
+            var kategoriRepository = KategoriRepository(database.kategoriDao())
+            kategoriRepository.tamSenkronizasyonYap()
 
-            repository.tamSenkronizasyonYap()
+            var notRepository = NotRepository(database.notDao())
+            notRepository.tamSenkronizasyonYap()
 
             Result.success()
         }catch (e:Exception){

@@ -6,13 +6,15 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 
-@Database(entities = [Not::class], version = 2, exportSchema = false)
+@Database(entities = [Not::class,Kategori::class], version = 3, exportSchema = false)
 abstract class RoomDbContext:RoomDatabase() {
 
-    abstract fun notDao():INotDataAccess
+    abstract fun notDao(): INotDataAccess
+    abstract fun kategoriDao(): IKategoriDataAccess
 
 }
 
+@Volatile
 private var KOPYA:RoomDbContext? = null
 
 fun databaseyiGetir(context: Context):RoomDbContext{
@@ -21,7 +23,7 @@ fun databaseyiGetir(context: Context):RoomDbContext{
             context.applicationContext,
             RoomDbContext::class.java,
             "personelnot_db"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
     }
     return KOPYA!!
 }

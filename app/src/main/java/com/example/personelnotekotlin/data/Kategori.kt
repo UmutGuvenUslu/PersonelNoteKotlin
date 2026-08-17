@@ -4,18 +4,16 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.util.UUID
 
+
 @Entity
-data class Not(
+data class Kategori (
+
     @PrimaryKey
     var _id:String = UUID.randomUUID().toString(),
-    var baslik:String,
-    var aciklama:String,
-    var kategoriId: UUID,
-    var kategori:String,
-    var oncelik:Int,
-    var guncellemeTarihi:Long = System.currentTimeMillis(),
+    var isim:String,
     var senkronMu:Boolean = false,
     var silindiMi:Boolean = false,
-    var sunucudaVarMi:Boolean = false
+    var sunucudaVarMi:Boolean = false,
+    var guncellemeTarihi:Long = System.currentTimeMillis()
 
-)
+    )
