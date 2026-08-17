@@ -23,8 +23,8 @@ interface INotDataAccess {
     @Query("UPDATE `Not` SET senkronMu = 1, sunucudaVarMi = 1 WHERE _id IN (:notidleri)")
     suspend fun notSenkronizeEt(notidleri:List<String>)
 
-    @Query("SELECT * FROM `Not` WHERE silindiMi = 0 ORDER BY oncelik DESC,guncellemeTarihi DESC ")
-    fun aktifNotlariGetir():Flow<List<Not>>
+    @Query("SELECT * FROM `Not` WHERE silindiMi = 0 AND (:kategoriAdi IS NULL OR kategoriAdi = :kategoriAdi) AND (:kullaniciId IS NULL OR kullaniciId = :kullaniciId) ORDER BY oncelik DESC, guncellemeTarihi DESC")
+    fun aktifNotlariGetir(kategoriAdi: String? = null, kullaniciId: String? = null): Flow<List<Not>>
 
     @Query("SELECT * FROM `Not` WHERE senkronMu = 0 ORDER BY guncellemeTarihi ASC")
     suspend fun senkronOlmayanlariGetir():List<Not>

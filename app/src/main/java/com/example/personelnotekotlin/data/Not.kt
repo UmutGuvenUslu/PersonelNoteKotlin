@@ -2,6 +2,7 @@ package com.example.personelnotekotlin.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.google.gson.annotations.SerializedName
 import java.util.UUID
 
 @Entity
@@ -10,8 +11,8 @@ data class Not(
     var _id:String = UUID.randomUUID().toString(),
     var baslik:String,
     var aciklama:String,
-    var kategoriId: UUID,
-    var kategori:String,
+    var kullaniciId:String,
+    var kategoriAdi:String,
     var oncelik:Int,
     var guncellemeTarihi:Long = System.currentTimeMillis(),
     var senkronMu:Boolean = false,
