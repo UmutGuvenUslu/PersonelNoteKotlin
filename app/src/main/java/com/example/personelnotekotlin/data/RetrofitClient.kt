@@ -24,4 +24,5 @@ object RetrofitClient {
 
     val notApiService: INotApi = apiService.create(INotApi::class.java)
     val kategoriApiService: IKategoriApi = apiService.create(IKategoriApi::class.java)
+
 }

@@ -12,25 +12,26 @@ class  NotRepository(
 
     fun aktifNotlariGetir(): Flow<List<Not>> = notDao.aktifNotlariGetir()
 
-    suspend fun notEkle(baslik:String,aciklama:String,oncelik:Int,kategoriId:String,kategori: String){
+    suspend fun notEkle(baslik:String,aciklama:String,oncelik:Int,kategori: String,kullanici: String){
         var yeniNot = Not(
             baslik = baslik,
             aciklama = aciklama,
             oncelik = oncelik,
-            kategoriId = UUID.fromString(kategoriId),
-            kategori = kategori
+            kullaniciId = kullanici,
+            kategoriId = kategori
         )
         notDao.notEkleVeyaGuncelle(yeniNot)
         notSenkronizeEt()
     }
 
-    suspend fun notDuzenle(not: Not,baslik:String,aciklama:String,oncelik:Int,kategoriId:String,kategori: String){
+    suspend fun notDuzenle(not: Not,baslik:String,aciklama:String,oncelik:Int,kategori: String,kullanici: String){
+        //rol
         var guncelNot = not.copy(
             baslik = baslik,
             aciklama = aciklama,
             oncelik = oncelik,
-            kategoriId = UUID.fromString(kategoriId),
-            kategori = kategori,
+            kullaniciId = kullanici,
+            kategoriId = kategori,
             guncellemeTarihi = System.currentTimeMillis(),
             senkronMu = false
         )
