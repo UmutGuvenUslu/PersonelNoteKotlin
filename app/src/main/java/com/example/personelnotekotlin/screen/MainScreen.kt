@@ -130,7 +130,7 @@ fun MainScreen() {
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "Henüz not bulunmuyor.\nYeni not eklemek için sağ üstteki + butonuna dokunun.",
+                        text = "Henüz not yok.\nYeni not ekleyebilirsiniz.",
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant

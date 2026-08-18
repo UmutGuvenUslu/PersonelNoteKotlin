@@ -38,16 +38,16 @@ fun ListCardComponent(
 
     fun oncelikToString(deger: Int): String {
         return when (deger) {
-            2 -> "Kritik"
-            1 -> "Orta"
+            3 -> "Kritik"
+            2 -> "Orta"
             else -> "Düşük"
         }
     }
 
     fun renk(deger: Int): Color {
         return when (deger) {
-            2 -> Color(0xFFE57373) // Kırmızı / Kritik
-            1 -> Color(0xFFFFB74D) // Turuncu / Orta
+            3 -> Color(0xFFE57373) // Kırmızı / Kritik
+            2 -> Color(0xFFFFB74D) // Turuncu / Orta
             else -> Color(0xFF81C784) // Yeşil / Düşük
         }
     }

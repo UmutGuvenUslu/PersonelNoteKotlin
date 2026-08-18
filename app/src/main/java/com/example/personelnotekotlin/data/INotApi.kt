@@ -7,11 +7,12 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface INotApi {
 
     @GET("notes")
-    suspend fun notGetir():Response<List<Not>>
+    suspend fun notGetir(@Query("sayfa") sayfa: Int? = null):Response<List<Not>>
 
     @POST("note")
     suspend fun notEkle(@Body not: Not):Response<Not>

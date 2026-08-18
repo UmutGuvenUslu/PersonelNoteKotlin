@@ -81,21 +81,35 @@ class  NotRepository(
 
     suspend fun sunucudanVerileriGuncelle() {
         try {
-            val yanit = notApi.notGetir()
-            if (yanit.isSuccessful) {
-                yanit.body()?.let { sunucudakiNotlar ->
-                    val sunucuIdListesi = sunucudakiNotlar.map { it._id }
-                    if (sunucuIdListesi.isEmpty()) {
-                        notDao.tumSunucuNotlariniSil()
-                    } else {
-                        notDao.sunucudaOlmayanNotlariSil(sunucuIdListesi)
+            val tumSunucudakiNotlar = mutableListOf<Not>()
+            var sayfa = 1
+            while (true) {
+                val yanit = notApi.notGetir(sayfa = sayfa)
+                if (yanit.isSuccessful) {
+                    val gelenNotlar = yanit.body()
+                    if (gelenNotlar.isNullOrEmpty()) {
+                        break
                     }
-
-                    for (not in sunucudakiNotlar) {
-                        val guncelNot = not.copy(senkronMu = true, sunucudaVarMi = true)
-                        notDao.notEkleVeyaGuncelle(guncelNot)
+                    tumSunucudakiNotlar.addAll(gelenNotlar)
+                    if (gelenNotlar.size < 10) {
+                        break
                     }
+                    sayfa++
+                } else {
+                    break
                 }
+            }
+
+            val sunucuIdListesi = tumSunucudakiNotlar.map { it._id }
+            if (sunucuIdListesi.isEmpty()) {
+                notDao.tumSunucuNotlariniSil()
+            } else {
+                notDao.sunucudaOlmayanNotlariSil(sunucuIdListesi)
+            }
+
+            for (not in tumSunucudakiNotlar) {
+                val guncelNot = not.copy(senkronMu = true, sunucudaVarMi = true)
+                notDao.notEkleVeyaGuncelle(guncelNot)
             }
         } catch (e: Exception) {
             e.printStackTrace()
