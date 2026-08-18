@@ -1,10 +1,15 @@
 package com.example.personelnotekotlin.screen
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -15,7 +20,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -61,18 +68,9 @@ fun MainScreen() {
         }
     )
 
-    val notListesi by notViewModel.notListesi.collectAsState()
+    val sayfaState by notViewModel.sayfaState.collectAsState()
     val kategoriler by kategoriViewModel.kategorilistesi.collectAsState()
     var showBottomSheet by remember { mutableStateOf(false) }
-    var secilenKategori by remember { mutableStateOf("") }
-
-    val filtrelenmisNotlar = remember(notListesi, secilenKategori) {
-        if (secilenKategori.isEmpty()) {
-            notListesi
-        } else {
-            notListesi.filter { it.kategoriId == secilenKategori }
-        }
-    }
 
     Scaffold(
         topBar = {
@@ -119,12 +117,12 @@ fun MainScreen() {
         ) {
             KategoriListComponent(
                 kategoriViewModel = kategoriViewModel,
-                onCategorySelected = { kategoriAdi ->
-                    secilenKategori = if (secilenKategori == kategoriAdi) "" else kategoriAdi
+                onCategorySelected = { kategoriId ->
+                    notViewModel.kategoriFiltrele(kategoriId)
                 }
             )
 
-            if (filtrelenmisNotlar.isEmpty()) {
+            if (sayfaState.gosterilenNotlar.isEmpty() && sayfaState.mevcutSayfa == 1) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -140,9 +138,17 @@ fun MainScreen() {
                 }
             } else {
                 ScrollContent(
-                    notListesi = filtrelenmisNotlar,
+                    notListesi = sayfaState.gosterilenNotlar,
                     viewModel = notViewModel,
-                    kategoriListesi = kategoriler
+                    kategoriListesi = kategoriler,
+                    modifier = Modifier.weight(1f)
+                )
+
+                PaginationControls(
+                    mevcutSayfa = sayfaState.mevcutSayfa,
+                    sonrakiVarMi = sayfaState.sonrakiVarMi,
+                    onOncekiClick = { notViewModel.oncekiSayfa() },
+                    onSonrakiClick = { notViewModel.sonrakiSayfa() }
                 )
             }
         }
@@ -166,14 +172,60 @@ fun MainScreen() {
 fun ScrollContent(
     notListesi: List<Not>,
     viewModel: NotViewModel,
-    kategoriListesi: List<com.example.personelnotekotlin.data.Kategori> = emptyList()
+    kategoriListesi: List<com.example.personelnotekotlin.data.Kategori> = emptyList(),
+    modifier: Modifier = Modifier
 ) {
     LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(8.dp)
+        modifier = modifier.fillMaxSize(),
+        contentPadding = PaddingValues(8.dp)
     ) {
-        items(notListesi, key = { it._id }) { not ->
+        items(
+            items = notListesi,
+            key = { not -> not._id }
+        ) { not ->
             ListCardComponent(not, viewModel, kategoriListesi)
+        }
+    }
+}
+
+@Composable
+fun PaginationControls(
+    mevcutSayfa: Int,
+    sonrakiVarMi: Boolean,
+    onOncekiClick: () -> Unit,
+    onSonrakiClick: () -> Unit
+) {
+    Surface(
+        tonalElevation = 2.dp,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 6.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            OutlinedButton(
+                onClick = onOncekiClick,
+                enabled = mevcutSayfa > 1
+            ) {
+                Text("Önceki")
+            }
+
+            Text(
+                text = "Sayfa $mevcutSayfa",
+                fontWeight = FontWeight.Medium,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            OutlinedButton(
+                onClick = onSonrakiClick,
+                enabled = sonrakiVarMi
+            ) {
+                Text("Sonraki")
+            }
         }
     }
 }

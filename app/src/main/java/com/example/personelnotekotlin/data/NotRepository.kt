@@ -1,14 +1,23 @@
 package com.example.personelnotekotlin.data
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import kotlinx.coroutines.flow.Flow
-import java.util.UUID
 
 class  NotRepository(
     private val notDao: INotDataAccess,
     private val notApi: INotApi = RetrofitClient.notApiService
 ){
 
-    fun aktifNotlariGetir(): Flow<List<Not>> = notDao.aktifNotlariGetir()
+    fun aktifNotlariSayfaliGetir(
+        kategoriId: String? = null,
+        kullaniciId: String? = null,
+        limit: Int = 20,
+        offset: Int = 0
+    ): Flow<List<Not>> {
+        return notDao.aktifNotlariSayfaliGetir(kategoriId, kullaniciId, limit, offset)
+    }
 
     suspend fun notEkle(baslik:String,aciklama:String,oncelik:Int,kategori: String,kullanici: String){
         var yeniNot = Not(
