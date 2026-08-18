@@ -13,6 +13,10 @@ class NotViewModel(
     private var repository: NotRepository
 ):ViewModel()
 {
+    init {
+        notSenkronizeEt()
+    }
+
     var notListesi:StateFlow<List<Not>> = repository.aktifNotlariGetir()
         .stateIn(
             scope = viewModelScope,
@@ -20,15 +24,15 @@ class NotViewModel(
             initialValue = emptyList()
         )
 
-    fun notEkle(baslik:String,aciklama:String,oncelik:String){
+    fun notEkle(baslik:String,aciklama:String,oncelik:String,kategoriId:String,kullaniciId:String){
         viewModelScope.launch {
-            repository.notEkle(baslik,aciklama,metinToSayi(oncelik))
+            repository.notEkle(baslik,aciklama, metinToSayi(oncelik),kategoriId, kullaniciId)
         }
     }
 
-    fun notDuzenle(not: Not,baslik:String,aciklama:String,oncelik:String){
+    fun notDuzenle(not: Not,baslik:String,aciklama:String,oncelik:String,kategoriId:String,kullaniciId:String){
         viewModelScope.launch {
-            repository.notDuzenle(not,baslik,aciklama,metinToSayi(oncelik))
+            repository.notDuzenle(not,baslik,aciklama,metinToSayi(oncelik),kategoriId, kullaniciId)
         }
     }
 

@@ -1,7 +1,5 @@
 package com.example.personelnotekotlin.data
 
-import RetrofitClient
-import androidx.room.Dao
 import kotlinx.coroutines.flow.Flow
 import java.util.UUID
 
@@ -77,6 +75,13 @@ class  NotRepository(
             val yanit = notApi.notGetir()
             if (yanit.isSuccessful) {
                 yanit.body()?.let { sunucudakiNotlar ->
+                    val sunucuIdListesi = sunucudakiNotlar.map { it._id }
+                    if (sunucuIdListesi.isEmpty()) {
+                        notDao.tumSunucuNotlariniSil()
+                    } else {
+                        notDao.sunucudaOlmayanNotlariSil(sunucuIdListesi)
+                    }
+
                     for (not in sunucudakiNotlar) {
                         val guncelNot = not.copy(senkronMu = true, sunucudaVarMi = true)
                         notDao.notEkleVeyaGuncelle(guncelNot)

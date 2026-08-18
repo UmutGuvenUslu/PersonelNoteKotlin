@@ -34,5 +34,11 @@ interface IKategoriDataAccess {
         @Query("SELECT COUNT(*) FROM `Kategori` WHERE senkronMu = 0")
         fun senkronOlmayanKategoriSayisi(): Flow<Int>
 
+        @Query("DELETE FROM `kategori` WHERE sunucudaVarMi = 1 AND senkronMu = 1 AND _id NOT IN (:sunucudakiIdler)")
+        suspend fun sunucudaOlmayanKategorileriSil(sunucudakiIdler: List<String>)
+
+        @Query("DELETE FROM `kategori` WHERE sunucudaVarMi = 1 AND senkronMu = 1")
+        suspend fun tumSunucuKategorileriniSil()
+
 
     }
