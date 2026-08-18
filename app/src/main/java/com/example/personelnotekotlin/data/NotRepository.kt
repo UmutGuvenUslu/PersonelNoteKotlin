@@ -1,16 +1,23 @@
 package com.example.personelnotekotlin.data
 
-import RetrofitClient
-import androidx.room.Dao
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import kotlinx.coroutines.flow.Flow
-import java.util.UUID
 
 class  NotRepository(
     private val notDao: INotDataAccess,
     private val notApi: INotApi = RetrofitClient.notApiService
 ){
 
-    fun aktifNotlariGetir(): Flow<List<Not>> = notDao.aktifNotlariGetir()
+    fun aktifNotlariSayfaliGetir(
+        kategoriId: String? = null,
+        kullaniciId: String? = null,
+        limit: Int = 20,
+        offset: Int = 0
+    ): Flow<List<Not>> {
+        return notDao.aktifNotlariSayfaliGetir(kategoriId, kullaniciId, limit, offset)
+    }
 
     suspend fun notEkle(baslik:String,aciklama:String,oncelik:Int,kategori: String,kullanici: String){
         var yeniNot = Not(
@@ -74,14 +81,35 @@ class  NotRepository(
 
     suspend fun sunucudanVerileriGuncelle() {
         try {
-            val yanit = notApi.notGetir()
-            if (yanit.isSuccessful) {
-                yanit.body()?.let { sunucudakiNotlar ->
-                    for (not in sunucudakiNotlar) {
-                        val guncelNot = not.copy(senkronMu = true, sunucudaVarMi = true)
-                        notDao.notEkleVeyaGuncelle(guncelNot)
+            val tumSunucudakiNotlar = mutableListOf<Not>()
+            var sayfa = 1
+            while (true) {
+                val yanit = notApi.notGetir(sayfa = sayfa)
+                if (yanit.isSuccessful) {
+                    val gelenNotlar = yanit.body()
+                    if (gelenNotlar.isNullOrEmpty()) {
+                        break
                     }
+                    tumSunucudakiNotlar.addAll(gelenNotlar)
+                    if (gelenNotlar.size < 10) {
+                        break
+                    }
+                    sayfa++
+                } else {
+                    break
                 }
+            }
+
+            val sunucuIdListesi = tumSunucudakiNotlar.map { it._id }
+            if (sunucuIdListesi.isEmpty()) {
+                notDao.tumSunucuNotlariniSil()
+            } else {
+                notDao.sunucudaOlmayanNotlariSil(sunucuIdListesi)
+            }
+
+            for (not in tumSunucudakiNotlar) {
+                val guncelNot = not.copy(senkronMu = true, sunucudaVarMi = true)
+                notDao.notEkleVeyaGuncelle(guncelNot)
             }
         } catch (e: Exception) {
             e.printStackTrace()

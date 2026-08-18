@@ -1,5 +1,5 @@
-import com.example.personelnotekotlin.data.IKategoriApi
-import com.example.personelnotekotlin.data.INotApi
+package com.example.personelnotekotlin.data
+
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -17,7 +17,7 @@ object RetrofitClient {
         .build()
 
     val apiService: Retrofit = Retrofit.Builder()
-        .baseUrl("https://b44e-2a00-1d34-d4a0-5300-259a-bd63-977e-53d5.ngrok-free.app/")
+        .baseUrl("http://10.0.2.2:1880/")
         .client(okHttpClient)
         .addConverterFactory(GsonConverterFactory.create())
         .build()

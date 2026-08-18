@@ -77,6 +77,13 @@ class KategoriRepository(
             val yanit = kategoriApi.kategorileriGetir()
             if (yanit.isSuccessful) {
                 yanit.body()?.let { sunucudakiKategoriler ->
+                    val sunucuIdListesi = sunucudakiKategoriler.map { it._id }
+                    if (sunucuIdListesi.isEmpty()) {
+                        kategoriDao.tumSunucuKategorileriniSil()
+                    } else {
+                        kategoriDao.sunucudaOlmayanKategorileriSil(sunucuIdListesi)
+                    }
+
                     for (kategori in sunucudakiKategoriler) {
                         val guncelkategori = kategori.copy(senkronMu = true, sunucudaVarMi = true)
                         kategoriDao.kategoriEkleVeyaGuncelle(guncelkategori)
@@ -91,10 +98,8 @@ class KategoriRepository(
 
     suspend fun tamSenkronizasyonYap() {
         kategoriSenkronizeEt()
-
         sunucudanVerileriGuncelle()
     }
-
 
 }
 

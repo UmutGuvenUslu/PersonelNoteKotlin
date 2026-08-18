@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 
-@Database(entities = [Not::class,Kategori::class], version = 4, exportSchema = false)
+@Database(entities = [Not::class,Kategori::class], version = 6, exportSchema = false)
 abstract class RoomDbContext:RoomDatabase() {
 
     abstract fun notDao(): INotDataAccess
