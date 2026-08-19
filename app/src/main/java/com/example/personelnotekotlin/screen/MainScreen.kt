@@ -4,16 +4,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.TopAppBar
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -26,10 +27,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,15 +45,22 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.personelnotekotlin.data.KategoriRepository
+import com.example.personelnotekotlin.data.Kullanici
 import com.example.personelnotekotlin.data.Not
 import com.example.personelnotekotlin.data.NotRepository
+import com.example.personelnotekotlin.data.OturumYoneticisi
+import com.example.personelnotekotlin.data.RetrofitClient
+import com.example.personelnotekotlin.data.cikisYap
 import com.example.personelnotekotlin.data.databaseyiGetir
+import com.example.personelnotekotlin.data.oturumStore
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
     val context = LocalContext.current
     val database = databaseyiGetir(context)
+    val kapsam = rememberCoroutineScope()
 
     val notViewModel: NotViewModel = viewModel(
         factory = viewModelFactory {
@@ -71,14 +81,39 @@ fun MainScreen() {
     val sayfaState by notViewModel.sayfaState.collectAsState()
     val kategoriler by kategoriViewModel.kategorilistesi.collectAsState()
     var showBottomSheet by remember { mutableStateOf(false) }
+    var kullanicilar by remember { mutableStateOf(listOf<Kullanici>()) }
+
+    LaunchedEffect(Unit) {
+        if (OturumYoneticisi.adminMi()){
+            try {
+                var yanit = RetrofitClient.kullaniciApiService.kullanicilariGetir()
+
+                if (yanit.isSuccessful){
+                    yanit.body()?.let { gelenKullanicilar ->
+                        kullanicilar = gelenKullanicilar
+                    }
+                }
+            }catch (e:Exception){
+                e.printStackTrace()
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
+            TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary
                 ),
+                title = {
+                    Text(
+                        text = OturumYoneticisi.adSoyad.ifEmpty { "Personel Not" },
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                },
                 actions = {
                     IconButton(onClick = {
                         notViewModel.notSenkronizeEt()
@@ -98,14 +133,17 @@ fun MainScreen() {
                             contentDescription = "Ekle"
                         )
                     }
-                },
-                title = {
-                    Text(
-                        "Personel Not Uygulaması",
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                    Spacer(modifier = Modifier.padding(2.dp))
+                    IconButton(onClick = {
+                        kapsam.launch {
+                            cikisYap(context)
+                        }
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Logout,
+                            contentDescription = "Çıkış Yap"
+                        )
+                    }
                 }
             )
         }
@@ -141,6 +179,7 @@ fun MainScreen() {
                     notListesi = sayfaState.gosterilenNotlar,
                     viewModel = notViewModel,
                     kategoriListesi = kategoriler,
+                    kullaniciListesi = kullanicilar,
                     modifier = Modifier.weight(1f)
                 )
 
@@ -159,6 +198,7 @@ fun MainScreen() {
             ilkBaslik = "",
             ilkIcerik = "",
             kategoriListesi = kategoriler,
+            kullaniciListesi = kullanicilar,
             onKapatRequest = { showBottomSheet = false },
             onKaydetClick = { baslik, icerik, oncelik, kategoriId, kullaniciId ->
                 notViewModel.notEkle(baslik, icerik, oncelik, kategoriId, kullaniciId)
@@ -173,6 +213,7 @@ fun ScrollContent(
     notListesi: List<Not>,
     viewModel: NotViewModel,
     kategoriListesi: List<com.example.personelnotekotlin.data.Kategori> = emptyList(),
+    kullaniciListesi: List<Kullanici> = emptyList(),
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -183,7 +224,7 @@ fun ScrollContent(
             items = notListesi,
             key = { not -> not._id }
         ) { not ->
-            ListCardComponent(not, viewModel, kategoriListesi)
+            ListCardComponent(not, viewModel, kategoriListesi, kullaniciListesi)
         }
     }
 }

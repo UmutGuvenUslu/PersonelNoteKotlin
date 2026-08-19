@@ -25,13 +25,17 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.personelnotekotlin.data.Kategori
+import com.example.personelnotekotlin.data.Kullanici
 import com.example.personelnotekotlin.data.Not
+import com.example.personelnotekotlin.data.OturumYoneticisi
 
 @Composable
 fun ListCardComponent(
     not: Not,
     notViewModel: NotViewModel,
-    kategoriListesi: List<com.example.personelnotekotlin.data.Kategori> = emptyList()
+    kategoriListesi: List<Kategori> = emptyList(),
+    kullaniciListesi: List<Kullanici> = emptyList()
 ) {
 
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -46,9 +50,9 @@ fun ListCardComponent(
 
     fun renk(deger: Int): Color {
         return when (deger) {
-            3 -> Color(0xFFE57373) // Kırmızı / Kritik
-            2 -> Color(0xFFFFB74D) // Turuncu / Orta
-            else -> Color(0xFF81C784) // Yeşil / Düşük
+            3 -> Color(0xFFE57373)
+            2 -> Color(0xFFFFB74D)
+            else -> Color(0xFF81C784)
         }
     }
 
@@ -86,6 +90,17 @@ fun ListCardComponent(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
+                if (OturumYoneticisi.adminMi()) {
+                    val atanan = kullaniciListesi.find { it._id == not.kullaniciId }
+                    if (atanan != null) {
+                        Text(
+                            text = "Atanan: ${atanan.isim} ${atanan.soyisim}",
+                            modifier = Modifier.padding(start = 16.dp, top = 2.dp, bottom = 2.dp),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
                 Text(
                     text = oncelikToString(not.oncelik),
                     modifier = Modifier.padding(start = 16.dp, bottom = 16.dp),
@@ -121,6 +136,7 @@ fun ListCardComponent(
             ilkKategoriId = not.kategoriId,
             ilkKullaniciId = not.kullaniciId,
             kategoriListesi = kategoriListesi,
+            kullaniciListesi = kullaniciListesi,
             onKapatRequest = { showBottomSheet = false },
             onKaydetClick = { baslik, icerik, oncelik, kategoriId, kullaniciId ->
                 notViewModel.notDuzenle(not, baslik, icerik, oncelik, kategoriId, kullaniciId)
