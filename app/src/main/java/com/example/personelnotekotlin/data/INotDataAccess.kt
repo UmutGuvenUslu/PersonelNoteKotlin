@@ -24,17 +24,11 @@ interface INotDataAccess {
     @Query("UPDATE `Not` SET senkronMu = 1, sunucudaVarMi = 1 WHERE _id IN (:notidleri)")
     suspend fun notSenkronizeEt(notidleri:List<String>)
 
-    @Query("SELECT * FROM `Not` WHERE silindiMi = 0 AND (:kategoriId IS NULL OR :kategoriId = '' OR kategoriId = :kategoriId) AND (:kullaniciId IS NULL OR :kullaniciId = '' OR kullaniciId = :kullaniciId) ORDER BY oncelik DESC, guncellemeTarihi DESC LIMIT :limit OFFSET :offset")
-    fun aktifNotlariSayfaliGetir(kategoriId: String? = null, kullaniciId: String? = null, limit: Int = 20, offset: Int = 0): Flow<List<Not>>
+    @Query("SELECT * FROM `Not` WHERE silindiMi = 0 AND (:adminMi = 1 OR kullaniciId = :kullaniciId) AND (:kategoriId IS NULL OR :kategoriId = '' OR kategoriId = :kategoriId) ORDER BY oncelik DESC, guncellemeTarihi DESC LIMIT :limit OFFSET :offset")
+    fun aktifNotlariSayfaliGetir(adminMi: Int = 0, kullaniciId: String = "", kategoriId: String? = null, limit: Int = 20, offset: Int = 0): Flow<List<Not>>
 
     @Query("SELECT * FROM `Not` WHERE senkronMu = 0 ORDER BY guncellemeTarihi ASC")
     suspend fun senkronOlmayanlariGetir():List<Not>
-
-    @Query("SELECT * FROM `Not` WHERE _id = :notid")
-    suspend fun idNotGetir(notid:String):Not?
-
-    @Query("SELECT COUNT(*) FROM `Not` WHERE senkronMu = 0")
-    fun senkronOlmayanSayisi():Flow<Int>
 
     @Query("DELETE FROM `Not` WHERE sunucudaVarMi = 1 AND senkronMu = 1 AND _id NOT IN (:sunucudakiIdler)")
     suspend fun sunucudaOlmayanNotlariSil(sunucudakiIdler: List<String>)

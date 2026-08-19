@@ -6,24 +6,16 @@ import androidx.work.WorkerParameters
 
 class SyncWorker(
     context: Context,
-    params:WorkerParameters,
-):CoroutineWorker(context,params) {
+    params: WorkerParameters,
+) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
         return try {
-            var database = databaseyiGetir(applicationContext)
-
-            var kategoriRepository = KategoriRepository(database.kategoriDao())
-            kategoriRepository.tamSenkronizasyonYap()
-
-            var notRepository = NotRepository(database.notDao())
-            notRepository.tamSenkronizasyonYap()
-
+            GenelSenkron.senkronizeEt(applicationContext)
             Result.success()
-        }catch (e:Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
             Result.retry()
         }
     }
-
 }

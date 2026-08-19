@@ -13,15 +13,6 @@ interface IKategoriApi {
     @GET("kategori")
     suspend fun kategorileriGetir():Response<List<Kategori>>
 
-    @POST("kategoriEkle")
-    suspend fun kategoriEkle(@Body kategori: Kategori):Response<Kategori>
-
-    @PUT("kategoriDuzenle/{id}")
-    suspend fun kategoriDuzenle(@Path("id") id:String ,@Body kategori: Kategori):Response<Kategori>
-
-    @DELETE("kategori/{id}")
-    suspend fun kategoriSil(@Path("id") id:String):Response<Unit>
-
     @POST("kategori/sync")
     suspend fun kategoriSenkronizeEt(@Body kategoriler: List<Kategori>):Response<Any>
 }

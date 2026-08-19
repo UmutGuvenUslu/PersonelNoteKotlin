@@ -28,12 +28,6 @@ interface IKategoriDataAccess {
         @Query("SELECT * FROM `kategori` WHERE senkronMu = 0 ORDER BY guncellemeTarihi ASC")
         suspend fun senkronOlmayanKategorileriGetir():List<Kategori>
 
-        @Query("SELECT * FROM `Kategori` WHERE _id = :kategoriid")
-        suspend fun idKategoriGetir(kategoriid:String):Kategori?
-
-        @Query("SELECT COUNT(*) FROM `Kategori` WHERE senkronMu = 0")
-        fun senkronOlmayanKategoriSayisi(): Flow<Int>
-
         @Query("DELETE FROM `kategori` WHERE sunucudaVarMi = 1 AND senkronMu = 1 AND _id NOT IN (:sunucudakiIdler)")
         suspend fun sunucudaOlmayanKategorileriSil(sunucudakiIdler: List<String>)
 

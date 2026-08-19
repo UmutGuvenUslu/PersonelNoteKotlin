@@ -10,6 +10,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.personelnotekotlin.data.Kategori
+import com.example.personelnotekotlin.data.Kullanici
+import com.example.personelnotekotlin.data.OturumYoneticisi
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -20,6 +22,7 @@ fun AddEditNoteBottomSheet(
     ilkKategoriId: String = "",
     ilkKullaniciId: String = "",
     kategoriListesi: List<Kategori> = emptyList(),
+    kullaniciListesi: List<Kullanici> = emptyList(),
     onKapatRequest: () -> Unit,
     onKaydetClick: (baslik: String, icerik: String, oncelik: String, kategoriId: String, kullaniciId: String) -> Unit
 ) {
@@ -30,6 +33,7 @@ fun AddEditNoteBottomSheet(
     var kategoriId by remember { mutableStateOf(ilkKategoriId) }
     var kullaniciId by remember { mutableStateOf(ilkKullaniciId) }
     var dropdownAcikMi by remember { mutableStateOf(false) }
+    var kullaniciDropdownAcikMi by remember { mutableStateOf(false) }
 
     val oncelikListesi = listOf("Düşük", "Orta", "Kritik")
 
@@ -99,6 +103,48 @@ fun AddEditNoteBottomSheet(
                                     dropdownAcikMi = false
                                 }
                             )
+                        }
+                    }
+                }
+            }
+
+            if (OturumYoneticisi.adminMi()) {
+                val secilenKullanici = kullaniciListesi.find { it._id == kullaniciId }
+                val secilenKullaniciIsmi = if (secilenKullanici == null) "Kullanıcı Seçiniz" else "${secilenKullanici.isim} ${secilenKullanici.soyisim}"
+
+                ExposedDropdownMenuBox(
+                    expanded = kullaniciDropdownAcikMi,
+                    onExpandedChange = { kullaniciDropdownAcikMi = !kullaniciDropdownAcikMi }
+                ) {
+                    OutlinedTextField(
+                        value = secilenKullaniciIsmi,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Atanan Kullanıcı") },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = kullaniciDropdownAcikMi) },
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = kullaniciDropdownAcikMi,
+                        onDismissRequest = { kullaniciDropdownAcikMi = false }
+                    ) {
+                        if (kullaniciListesi.isEmpty()) {
+                            DropdownMenuItem(
+                                text = { Text("Kullanıcı Bulunamadı") },
+                                onClick = { kullaniciDropdownAcikMi = false }
+                            )
+                        } else {
+                            kullaniciListesi.forEach { kullanici ->
+                                DropdownMenuItem(
+                                    text = { Text("${kullanici.isim} ${kullanici.soyisim}") },
+                                    onClick = {
+                                        kullaniciId = kullanici._id
+                                        kullaniciDropdownAcikMi = false
+                                    }
+                                )
+                            }
                         }
                     }
                 }

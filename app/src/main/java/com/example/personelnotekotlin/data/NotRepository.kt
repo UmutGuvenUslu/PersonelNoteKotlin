@@ -1,8 +1,5 @@
 package com.example.personelnotekotlin.data
 
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
 import kotlinx.coroutines.flow.Flow
 
 class  NotRepository(
@@ -12,19 +9,32 @@ class  NotRepository(
 
     fun aktifNotlariSayfaliGetir(
         kategoriId: String? = null,
-        kullaniciId: String? = null,
         limit: Int = 20,
         offset: Int = 0
     ): Flow<List<Not>> {
-        return notDao.aktifNotlariSayfaliGetir(kategoriId, kullaniciId, limit, offset)
+
+        var adminMi = 0
+
+        if (OturumYoneticisi.adminMi()){
+            adminMi = 1
+        }
+
+        return notDao.aktifNotlariSayfaliGetir(adminMi,OturumYoneticisi.kullaniciId,kategoriId,limit,offset)
     }
 
     suspend fun notEkle(baslik:String,aciklama:String,oncelik:Int,kategori: String,kullanici: String){
+
+        var atanan = OturumYoneticisi.kullaniciId
+
+        if (OturumYoneticisi.adminMi() && kullanici != ""){
+            atanan = kullanici
+        }
+
         var yeniNot = Not(
             baslik = baslik,
             aciklama = aciklama,
             oncelik = oncelik,
-            kullaniciId = kullanici,
+            kullaniciId = atanan,
             kategoriId = kategori
         )
         notDao.notEkleVeyaGuncelle(yeniNot)
@@ -33,11 +43,17 @@ class  NotRepository(
 
     suspend fun notDuzenle(not: Not,baslik:String,aciklama:String,oncelik:Int,kategori: String,kullanici: String){
         //rol
+        var atanan = OturumYoneticisi.kullaniciId
+
+        if (OturumYoneticisi.adminMi() && kullanici != ""){
+            atanan = kullanici
+        }
+
         var guncelNot = not.copy(
             baslik = baslik,
             aciklama = aciklama,
             oncelik = oncelik,
-            kullaniciId = kullanici,
+            kullaniciId = atanan,
             kategoriId = kategori,
             guncellemeTarihi = System.currentTimeMillis(),
             senkronMu = false
