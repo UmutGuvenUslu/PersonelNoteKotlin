@@ -171,12 +171,6 @@ PersonelNoteKotlin/
 
 ---
 
-## 📄 Lisans
-
-Bu proje **[MIT Lisansı](LICENSE)** kapsamında lisanslanmıştır.
-
----
-
 <div align="center">
 
 Geliştirici: **[Umut Güven Uslu](https://github.com/UmutGuvenUslu)**
